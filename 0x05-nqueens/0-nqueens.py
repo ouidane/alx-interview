@@ -1,43 +1,54 @@
 #!/usr/bin/python3
-"""Solves the N Queens problem using backtracking.
+"""
+Solves the N Queens problem using backtracking.
 """
 
 import sys
 
 
-if len(sys.argv) > 2 or len(sys.argv) < 2:
-    print("Usage: nqueens N")
-    exit(1)
+def is_safe(queen_positions, row, col):
+    """Check if placing a queen at (row, col) is safe."""
+    for r in range(row):
+        c = queen_positions[r]
+        if c == col or abs(c - col) == abs(r - row):
+            return False
+    return True
 
-if not sys.argv[1].isdigit():
-    print("N must be a number")
-    exit(1)
 
-if int(sys.argv[1]) < 4:
-    print("N must be at least 4")
-    exit(1)
+def solve_nqueens(n, row=0, queen_positions=[], solutions=[]):
+    """Recursively solve the N Queens problem."""
+    if row == n:
+        solutions.append([[r, queen_positions[r]] for r in range(n)])
+        return
 
-n = int(sys.argv[1])
+    for col in range(n):
+        if is_safe(queen_positions, row, col):
+            queen_positions.append(col)
+            solve_nqueens(n, row + 1, queen_positions, solutions)
+            queen_positions.pop()
 
-def queens(n, i=0, a=[], b=[], c=[]):
-    """ find possible positions """
-    if i < n:
-        for j in range(n):
-            if j not in a and i + j not in b and i - j not in c:
-                yield from queens(n, i + 1, a + [j], b + [i + j], c + [i - j])
-    else:
-        yield a
 
-def solve(n):
-    """ solve """
-    k = []
-    i = 0
-    for solution in queens(n, 0):
-        for s in solution:
-            k.append([i, s])
-            i += 1
-        print(k)
-        k = []
-        i = 0
+def main():
+    """Entry point for the N Queens script."""
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
 
-solve(n)
+    try:
+        n = int(sys.argv[1])
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
+
+    if n < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+
+    solutions = []
+    solve_nqueens(n, queen_positions=[], solutions=solutions)
+    for solution in solutions:
+        print(solution)
+
+
+if __name__ == "__main__":
+    main()
